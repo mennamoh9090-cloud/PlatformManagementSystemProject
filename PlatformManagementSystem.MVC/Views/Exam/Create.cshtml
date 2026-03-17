@@ -1,0 +1,23 @@
+﻿@model PlatformManagementSystem.MVC.ViewModels.Exam.CreateExamViewModel
+
+<div class="container mt-5">
+    <div class="card shadow-lg p-4 rounded-4">
+        <h3 class="mb-4">Create Exam</h3>
+
+        <form method="post">
+            <input type="hidden" asp-for="CourseId" />
+
+            <div class="mb-3">
+                <label>Title</label>
+                <input asp-for="Title" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label>Duration (minutes)</label>
+                <input asp-for="DurationMinutes" class="form-control" />
+            </div>
+
+            <button class="btn btn-dark w-100">Create</button>
+        </form>
+    </div>
+</div>

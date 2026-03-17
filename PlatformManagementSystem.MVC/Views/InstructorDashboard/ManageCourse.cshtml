@@ -1,0 +1,126 @@
+@using PlatformManagementSystem.MVC.ViewModels.InstructorDashboard
+@model CourseDetailsVM
+
+@{
+    Layout = "_InstructorLayout";
+    ViewData["Title"] = "Manage Course Details";
+}
+
+<div class="container py-4">
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card shadow-sm border-0 bg-primary text-white rounded-4 p-4 p-md-5">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                    <div>
+                        <span class="badge bg-white text-primary mb-2 px-3 py-2 rounded-pill fw-semibold shadow-sm">
+                            <i class="bi bi-book me-1"></i> Course Management
+                        </span>
+                        <h2 class="fw-bold mb-2">@Model.Title</h2>
+                        <p class="mb-0 text-white-50 fs-5" style="max-width: 800px;">@Model.Description</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-6 col-lg-3">
+            <a asp-controller="Lessons" asp-action="Create" asp-route-courseId="@Model.Id" class="text-decoration-none">
+                <div class="card shadow-sm border-0 h-100 rounded-4 transition-hover bg-light text-center p-4">
+                    <i class="bi bi-file-earmark-plus text-primary mb-3" style="font-size: 2.5rem;"></i>
+                    <h5 class="fw-bold text-dark">Add Content</h5>
+                    <p class="text-muted small mb-0">Create new text or video lessons</p>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-md-6 col-lg-3">
+            <a asp-controller="Lessons" asp-action="Index" asp-route-courseId="@Model.Id" class="text-decoration-none">
+                <div class="card shadow-sm border-0 h-100 rounded-4 transition-hover bg-light text-center p-4">
+                    <i class="bi bi-collection-play text-info mb-3" style="font-size: 2.5rem;"></i>
+                    <h5 class="fw-bold text-dark">Manage Lessons</h5>
+                    <p class="text-muted small mb-0">View, edit, or delete added content</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <a asp-controller="LiveSession" asp-action="ByCourse" asp-route-courseId="@Model.Id" class="text-decoration-none">
+                <div class="card shadow-sm border-0 h-100 rounded-4 transition-hover bg-light text-center p-4">
+                    <i class="bi bi-broadcast text-success mb-3" style="font-size: 2.5rem;"></i>
+                    <h5 class="fw-bold text-dark">Live Sessions</h5>
+                    <p class="text-muted small mb-0">Schedule and manage live interactive board</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <a asp-controller="InstructorDashboard" asp-action="MyCourses" class="text-decoration-none">
+                <div class="card shadow-sm border-0 h-100 rounded-4 transition-hover bg-light text-center p-4">
+                    <i class="bi bi-arrow-return-left text-secondary mb-3" style="font-size: 2.5rem;"></i>
+                    <h5 class="fw-bold text-dark">Back to Courses</h5>
+                    <p class="text-muted small mb-0">Return to your complete course list</p>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Content List Preview -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0 rounded-4 p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="fw-bold m-0"><i class="bi bi-play-btn me-2 text-primary"></i>Recent Lessons</h4>
+                    <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">
+                        @Model.Lessons.Count Total
+                    </span>
+                </div>
+
+                @if (Model.Lessons == null || !Model.Lessons.Any())
+                {
+                    <div class="text-center py-5">
+                        <i class="bi bi-folder-x text-muted opacity-25 mb-3" style="font-size: 3rem;"></i>
+                        <h5 class="fw-bold text-muted">No content published yet</h5>
+                        <p class="text-muted small">Your students are waiting for your amazing content.</p>
+                        <a asp-controller="Lessons" asp-action="Create" asp-route-courseId="@Model.Id" class="btn btn-outline-primary mt-2 rounded-pill px-4">Get Started</a>
+                    </div>
+                }
+                else
+                {
+                    <div class="list-group list-group-flush">
+                        @foreach (var lesson in Model.Lessons.Take(5))
+                        {
+                            <div class="list-group-item d-flex align-items-center justify-content-between py-3 border-bottom px-0">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                        <i class="bi bi-file-text"></i>
+                                    </div>
+                                    <span class="fw-medium text-dark">@lesson.Title</span>
+                                </div>
+                                <a asp-controller="Lessons" asp-action="Index" asp-route-courseId="@Model.Id" class="btn btn-sm btn-light rounded-pill px-3">View</a>
+                            </div>
+                        }
+                    </div>
+                    @if (Model.Lessons.Count > 5)
+                    {
+                        <div class="text-center mt-4">
+                           <a asp-controller="Lessons" asp-action="Index" asp-route-courseId="@Model.Id" class="text-decoration-none fw-semibold">View All Lessons <i class="bi bi-arrow-right ms-1"></i></a>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .transition-hover {
+        transition: all 0.2s ease-in-out;
+    }
+    .transition-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        background-color: #fff !important;
+    }
+</style>

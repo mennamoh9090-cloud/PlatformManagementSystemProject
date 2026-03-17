@@ -1,0 +1,29 @@
+﻿@model List<PlatformManagementSystem.MVC.ViewModels.Course.CourseViewModel>
+
+<h2>My Courses</h2>
+
+@if (Model.Any())
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var course in Model)
+            {
+                <tr>
+                    <td>@course.Title</td>
+                    <td>@course.Description</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>You are not enrolled in any courses yet.</p>
+}
+

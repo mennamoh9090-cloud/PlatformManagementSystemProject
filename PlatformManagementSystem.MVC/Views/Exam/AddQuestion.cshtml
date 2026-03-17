@@ -1,0 +1,26 @@
+﻿@model PlatformManagementSystem.MVC.ViewModels.Exam.AddQuestionViewModel
+
+<div class="container mt-5">
+    <div class="card shadow-lg p-4 rounded-4">
+        <h3>Add Question</h3>
+
+        <form method="post">
+            <input type="hidden" asp-for="ExamId" />
+
+            <div class="mb-3">
+                <label>Question</label>
+                <input asp-for="Text" class="form-control" />
+            </div>
+
+            @for (int i = 0; i < Model.Answers.Count; i++)
+            {
+                <div class="mb-2">
+                    <input name="Answers[@i]" class="form-control" placeholder="Answer @(i + 1)" />
+                    <input type="radio" name="CorrectAnswerIndex" value="@i" /> Correct
+                </div>
+            }
+
+            <button class="btn btn-dark mt-3 w-100">Add Question</button>
+        </form>
+    </div>
+</div>

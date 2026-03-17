@@ -1,0 +1,42 @@
+@using PlatformManagementSystem.MVC.ViewModels.Auth
+@model RegisterViewModel
+
+<div class="container mt-5">
+    <div class="card p-4 shadow">
+        <h3 class="text-center mb-4">Register</h3>
+
+        <form method="post">
+            <div class="mb-3">
+                <label>Full Name</label>
+                <input asp-for="FullName" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label>Email</label>
+                <input asp-for="Email" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label>Password</label>
+                <input asp-for="Password" type="password" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label>Role</label>
+                <select asp-for="Role" class="form-control">
+                    <option value="Student">Student</option>
+                    <option value="Instructor">Instructor</option>
+                    <option value="Admin">Admin</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-success w-100">
+                Register
+            </button>
+
+            <div class="text-center mt-3">
+                <a asp-action="Login">Already have account?</a>
+            </div>
+        </form>
+    </div>
+</div>

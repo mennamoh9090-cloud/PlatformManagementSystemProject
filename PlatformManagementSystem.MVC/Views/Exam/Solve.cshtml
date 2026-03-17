@@ -1,0 +1,26 @@
+﻿@model dynamic
+
+<form method="post" action="/Exam/Submit">
+
+    <input type="hidden" name="examId" value="@Model.Id" />
+
+    @foreach (var question in Model.Questions)
+    {
+        <div class="card p-3 mb-3">
+            <h5>@question.Text</h5>
+
+            @foreach (var answer in question.Answers)
+            {
+                <div>
+                    <input type="radio"
+                           name="submittedAnswers[@question.Id]"
+                           value="@answer.Id" />
+                    @answer.Text
+                </div>
+            }
+        </div>
+    }
+
+    <button class="btn btn-success w-100">Submit</button>
+
+</form>

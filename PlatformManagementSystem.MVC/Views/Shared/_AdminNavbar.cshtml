@@ -1,0 +1,15 @@
+@if (User.IsInRole("Admin"))
+{
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand">Admin Panel</a>
+        <div class="sidebar">
+            <div class="logo">LMS Admin</div>
+
+            <a asp-controller="AdminDashboard" asp-action="Index">Dashboard</a>
+            <a asp-controller="AdminDashboard" asp-action="Users">Users</a>
+            <a asp-controller="AdminDashboard" asp-action="Roles">Roles</a>
+            <a asp-controller="AdminDashboard" asp-action="Courses">Courses</a>
+            <a asp-controller="Account" asp-action="Logout">Logout</a>
+        </div>
+    </nav>
+}

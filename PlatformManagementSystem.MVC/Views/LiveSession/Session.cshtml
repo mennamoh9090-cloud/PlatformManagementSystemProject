@@ -1,0 +1,19 @@
+@{
+    ViewData["Title"] = "Live Session";
+    var sessionId = (int)(ViewBag.SessionId ?? 0);
+    var courseId = (int)(ViewBag.CourseId ?? 0);
+}
+
+<div class="card p-4">
+    <h3 class="mb-2">Live Session Ready</h3>
+    <p class="text-muted mb-4">Session #@sessionId is active. Open the live board to start collaboration.</p>
+    <div class="d-flex gap-2">
+        <a asp-action="Board"
+           asp-route-sessionId="@sessionId"
+           asp-route-courseId="@courseId"
+           class="btn btn-primary">Open Live Board</a>
+        <a asp-action="ByCourse"
+           asp-route-courseId="@courseId"
+           class="btn btn-outline-secondary">Back to Sessions</a>
+    </div>
+</div>

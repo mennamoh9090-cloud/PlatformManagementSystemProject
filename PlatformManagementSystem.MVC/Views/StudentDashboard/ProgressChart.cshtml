@@ -1,0 +1,107 @@
+﻿@model List<PlatformManagementSystem.MVC.ViewModels.Student.StudentProgressVM>
+
+@{
+    var avg = Model.Any() ? Model.Average(x => x.ProgressPercentage) : 0;
+}
+
+<h2 class="text-center fw-bold mb-4">📊 Learning Progress Overview</h2>
+
+<div class="row">
+
+    <!-- Bar Chart -->
+    <div class="col-md-8">
+        <div class="card shadow-lg border-0 rounded-4 p-4">
+            <canvas id="progressChart" height="120"></canvas>
+        </div>
+    </div>
+
+    <!-- Average Card -->
+    <div class="col-md-4">
+        <div class="card shadow-lg border-0 rounded-4 p-4 text-center">
+
+            <h5 class="text-muted">Average Progress</h5>
+
+            <h1 class="display-4 fw-bold text-primary">
+                @avg%
+            </h1>
+
+            <hr />
+
+            <canvas id="averageChart"></canvas>
+
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    var ctx = document.getElementById('progressChart').getContext('2d');
+
+    var gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, "#4e73df");
+    gradient.addColorStop(1, "#1cc88a");
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [
+                @foreach (var item in Model)
+                {
+                    @: "@item.CourseTitle",
+                }
+            ],
+            datasets: [{
+                label: 'Completion %',
+                data: [
+                    @foreach (var item in Model)
+                    {
+                        @: @item.ProgressPercentage,
+                    }
+                ],
+                backgroundColor: gradient,
+                borderRadius: 12,
+                borderSkipped: false
+            }]
+        },
+        options: {
+            responsive: true,
+            animation: {
+                duration: 1200
+            },
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
+        }
+    });
+
+    // Doughnut Chart for Average
+    var avgCtx = document.getElementById('averageChart').getContext('2d');
+
+    new Chart(avgCtx, {
+        type: 'doughnut',
+        data: {
+            datasets: [{
+                data: [@avg, 100 - @avg],
+                backgroundColor: ["#4e73df", "#eaeaea"],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            cutout: '80%',
+            plugins: {
+                tooltip: { enabled: false },
+                legend: { display: false }
+            }
+        }
+    });
+</script>
+}

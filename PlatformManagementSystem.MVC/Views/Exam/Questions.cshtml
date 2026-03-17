@@ -1,0 +1,52 @@
+@model List<PlatformManagementSystem.MVC.ViewModels.Exam.QuestionViewModel>
+
+<h2>Manage Questions</h2>
+
+<a asp-action="AddQuestion" asp-route-examId="@ViewBag.ExamId" class="btn btn-success">
+    Add Question
+</a>
+
+<hr />
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Question</th>
+            <th>Answers</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var question in Model)
+        {
+            <tr>
+                <td>@question.Text</td>
+                <td>
+                    <ul>
+                        @foreach (var answer in question.Answers)
+                        {
+                            <li>
+                                @answer.Text
+                                @if (answer.IsCorrect)
+                                {
+                                    <span style="color:green;">(Correct)</span>
+                                }
+                            </li>
+                        }
+                    </ul>
+                </td>
+                <td>
+                    <a asp-action="EditQuestion"
+                       asp-route-questionId="@question.Id"
+                       class="btn btn-warning">Edit</a>
+
+                    <form asp-action="DeleteQuestion" method="post" class="d-inline">
+                        <input type="hidden" name="questionId" value="@question.Id" />
+                        <input type="hidden" name="examId" value="@ViewBag.ExamId" />
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

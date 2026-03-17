@@ -1,0 +1,12 @@
+@{
+    ViewData["Title"] = "Exam Result";
+}
+
+<div class="card p-4">
+    <h3>Exam Submitted</h3>
+    <p class="mb-3">Your exam has been submitted successfully.</p>
+    <h4 class="text-primary">Score: @ViewBag.Score</h4>
+    <a asp-controller="StudentDashboard" asp-action="Index" class="btn btn-outline-secondary mt-3">
+        Back to Dashboard
+    </a>
+</div>

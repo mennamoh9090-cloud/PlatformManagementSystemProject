@@ -1,0 +1,179 @@
+@model CourseDetailsViewModel
+
+<div class="course-hero py-5 mb-5 rounded-4 shadow-sm" style="background: linear-gradient(135deg, #1e3a5f 0%, #0d1b2a 100%); color: #fff; margin-top: -1.5rem; border-radius: 0 0 2rem 2rem !important;">
+    <div class="container py-4">
+        <div class="row align-items-center">
+
+            <div class="col-lg-7 mb-5 mb-lg-0 pr-lg-5">
+                <span class="badge bg-warning text-dark mb-3 px-3 py-2 rounded-pill fw-bold" style="letter-spacing: 1px;">COURSE DETAILS</span>
+                <h1 class="fw-bold display-5 mb-3">@Model.Title</h1>
+                <p class="lead text-white-50 mb-4" style="line-height: 1.6;">@Model.Description</p>
+
+                <div class="d-flex flex-wrap gap-4 mb-4 align-items-center">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-star-fill text-warning me-2"></i>
+                        <span class="fs-5 fw-semibold">@Model.Rating</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-people-fill text-info me-2"></i>
+                        <span class="fs-5">@Model.StudentsCount Enrolled</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-journal-check text-success me-2"></i>
+                        <span class="fs-5">@Model.Lessons.Count Lessons</span>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    @if (!Model.IsEnrolled)
+                    {
+                        <form asp-action="Enroll" asp-controller="Courses" method="post" class="d-inline">
+                            <input type="hidden" name="courseId" value="@Model.Id" />
+                            <button type="submit" class="btn btn-warning btn-lg px-5 py-3 rounded-pill shadow fw-bold d-inline-flex align-items-center">
+                                Join Course Now - $@Model.Price
+                                <i class="bi bi-arrow-right fw-bold ms-2"></i>
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success p-3 rounded-pill fs-6 shadow">
+                            <i class="bi bi-check-circle-fill me-2"></i> You are enrolled in this course
+                        </span>
+                    }
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="position-relative w-100 shadow-lg rounded-4 overflow-hidden" style="border: 4px solid rgba(255,255,255,0.1);">
+                    <img src="@(string.IsNullOrEmpty(Model.ThumbnailUrl)
+                        ? "https://images.unsplash.com/photo-1516321497487-e288fb19713f?w=800&q=80"
+                        : Model.ThumbnailUrl)"
+                         class="img-fluid w-100 object-fit-cover" style="height: 350px;" alt="Course Thumbnail" />
+                    
+                    @if (!Model.IsEnrolled)
+                    {
+                        <div class="position-absolute bottom-0 start-0 w-100 p-3" style="background: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, transparent 100%);">
+                            <h3 class="text-white fw-bold mb-0 text-center">$@Model.Price</h3>
+                        </div>
+                    }
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="container mb-5 pb-5">
+
+    <div class="row">
+        <!-- Main Content Column -->
+        <div class="col-lg-8 pe-lg-5">
+            <h3 class="fw-bold mb-4 d-flex align-items-center">
+                <i class="bi bi-list-check text-primary me-2"></i> Course Curriculum
+            </h3>
+
+            @if (Model.Lessons != null && Model.Lessons.Any())
+            {
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-5">
+                    <div class="accordion accordion-flush" id="lessonAccordion">
+                        @{ int lessonIndex = 1; }
+                        @foreach (var lesson in Model.Lessons)
+                        {
+                            <div class="accordion-item border-bottom">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed py-3 fw-semibold"
+                                            type="button"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#lesson-@lesson.Id">
+                                        <span class="text-muted me-3">@lessonIndex.ToString("D2")</span> @lesson.Title
+                                    </button>
+                                </h2>
+
+                                <div id="lesson-@lesson.Id"
+                                     class="accordion-collapse collapse"
+                                     data-bs-parent="#lessonAccordion">
+
+                                    <div class="accordion-body bg-light py-4 d-flex justify-content-between align-items-center">
+                                        <div class="d-flex align-items-center text-muted">
+                                            <i class="bi bi-play-circle-fill text-primary fs-4 me-3"></i>
+                                            <span>Video Lesson</span>
+                                        </div>
+
+                                        <div>
+                                            @if (Model.IsEnrolled)
+                                            {
+                                                if (lesson.IsCompleted)
+                                                {
+                                                    <span class="badge bg-success px-3 py-2 rounded-pill"><i class="bi bi-check2-all me-1"></i> Completed</span>
+                                                }
+                                                else
+                                                {
+                                                    <a href="#" class="btn btn-outline-primary btn-sm rounded-pill px-4">Watch Now</a>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary px-3 py-2 rounded-pill"><i class="bi bi-lock-fill me-1"></i> Locked</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            lessonIndex++;
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-light text-center py-5 border border-dashed rounded-4">
+                    <i class="bi bi-journal-x text-muted mb-3 d-block" style="font-size: 2.5rem;"></i>
+                    <h5 class="text-muted">Curriculum is being prepared</h5>
+                    <p class="small text-muted mb-0">Lessons will be added to this course shortly.</p>
+                </div>
+            }
+        </div>
+
+        <!-- Sidebar Column -->
+        <div class="col-lg-4 mt-5 mt-lg-0">
+            <div class="instructor-box p-4 shadow-sm rounded-4 bg-white border border-light position-sticky" style="top: 100px;">
+                <h4 class="fw-bold mb-4">About the Instructor</h4>
+                
+                <div class="d-flex align-items-center mb-4">
+                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 60px; height: 60px; font-size: 1.5rem;">
+                        @(string.IsNullOrEmpty(Model.InstructorName) ? "I" : Model.InstructorName.Substring(0, 1).ToUpper())
+                    </div>
+                    <div class="ms-3">
+                        <h5 class="fw-bold mb-1">@Model.InstructorName</h5>
+                        <p class="text-muted small mb-0"><i class="bi bi-patch-check-fill text-primary me-1"></i> Verified Expert</p>
+                    </div>
+                </div>
+                
+                <p class="text-muted mb-0" style="line-height: 1.6;">
+                    @(string.IsNullOrEmpty(Model.InstructorBio) ? "This instructor is a seasoned professional with years of industry experience, dedicated to sharing practical knowledge and actionable insights to help you advance your career." : Model.InstructorBio)
+                </p>
+
+                <hr class="my-4" />
+                <h6 class="fw-bold mb-3 text-muted text-uppercase small">Course Includes</h6>
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2"><i class="bi bi-journal-video text-primary me-2"></i> On-demand video lessons</li>
+                    <li class="mb-2"><i class="bi bi-infinity text-primary me-2"></i> Full lifetime access</li>
+                    <li class="mb-2"><i class="bi bi-phone text-primary me-2"></i> Access on mobile and TV</li>
+                    <li><i class="bi bi-trophy text-primary me-2"></i> Certificate of completion</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .border-dashed { border-style: dashed !important; }
+    .accordion-button:not(.collapsed) {
+        background-color: #f8f9fa;
+        color: #0d6efd;
+        box-shadow: inset 0 -1px 0 rgba(0,0,0,.125);
+    }
+    .accordion-button:focus { box-shadow: none; border-color: rgba(0,0,0,.125); }
+    .object-fit-cover { object-fit: cover; }
+</style>

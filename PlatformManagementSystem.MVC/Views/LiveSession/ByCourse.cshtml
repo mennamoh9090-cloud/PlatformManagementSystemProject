@@ -1,0 +1,86 @@
+@model List<PlatformManagementSystem.MVC.ViewModels.Live.LiveSessionVM>
+
+@{
+    ViewData["Title"] = "Live Sessions";
+    var courseId = (int)(ViewBag.CourseId ?? 0);
+}
+
+<h2 class="mb-4">Live Sessions</h2>
+
+<div class="card p-3 mb-4">
+    <h5>Create New Session</h5>
+    <form asp-action="Create" method="post" class="row g-3 mt-1">
+        <input type="hidden" name="courseId" value="@courseId" />
+        <div class="col-md-4">
+            <input name="title" class="form-control" placeholder="Session title" required />
+        </div>
+        <div class="col-md-3">
+            <input name="startTime" type="datetime-local" class="form-control" required />
+        </div>
+        <div class="col-md-4">
+            <input name="meetingUrl" class="form-control" placeholder="Meeting URL (optional)" />
+        </div>
+        <div class="col-md-1 d-grid">
+            <button class="btn btn-primary" type="submit">Create</button>
+        </div>
+    </form>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No live sessions for this course yet.</div>
+}
+else
+{
+    <table class="table table-bordered align-middle">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Start Time</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var session in Model)
+            {
+                <tr>
+                    <td>@session.Title</td>
+                    <td>@session.StartTime.ToLocalTime().ToString("g")</td>
+                    <td>
+                        @if (session.IsActive)
+                        {
+                            <span class="badge bg-success">Active</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Scheduled</span>
+                        }
+                    </td>
+                    <td class="d-flex gap-2">
+                        @if (!session.IsActive)
+                        {
+                            <form asp-action="Start" method="post">
+                                <input type="hidden" name="id" value="@session.Id" />
+                                <input type="hidden" name="courseId" value="@courseId" />
+                                <button class="btn btn-sm btn-success" type="submit">Start</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <a asp-action="Board"
+                               asp-route-sessionId="@session.Id"
+                               asp-route-courseId="@courseId"
+                               class="btn btn-sm btn-primary">Open Board</a>
+                            <form asp-action="End" method="post">
+                                <input type="hidden" name="id" value="@session.Id" />
+                                <input type="hidden" name="courseId" value="@courseId" />
+                                <button class="btn btn-sm btn-danger" type="submit">End</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

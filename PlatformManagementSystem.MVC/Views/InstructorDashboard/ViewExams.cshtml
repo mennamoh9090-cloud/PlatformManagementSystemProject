@@ -1,0 +1,20 @@
+﻿@using PlatformManagementSystem.MVC.ViewModels.Exam
+@model List<ExamViewModel>
+
+<h2>Exams</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var exam in Model)
+        {
+            <tr>
+                <td>@exam.Title</td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,81 @@
+@model List<PlatformManagementSystem.MVC.ViewModels.Admin.AdminRoleVM>
+
+@{
+    ViewData["Title"] = "Manage Roles";
+}
+
+<div class="row mb-4">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <h2 class="fw-bold m-0"><i class="bi bi-shield-lock me-2 text-primary"></i>Manage Roles</h2>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Create Role Form -->
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="card-title fw-bold mb-3">Create New Role</h5>
+                <form asp-action="CreateRole" method="post">
+                    <div class="mb-3">
+                        <label for="roleName" class="form-label text-muted small">Role Name</label>
+                        <input type="text" class="form-control" id="roleName" name="roleName" required placeholder="e.g. Moderator" />
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Create Role</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Roles List -->
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Role ID</th>
+                                <th>Role Name</th>
+                                <th class="text-end pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.Any())
+                            {
+                                foreach (var role in Model)
+                                {
+                                    <tr>
+                                        <td class="ps-4 text-muted small">@role.Id</td>
+                                        <td>
+                                            <span class="badge bg-secondary">@role.Name</span>
+                                        </td>
+                                        <td class="text-end pe-4">
+                                            @if(role.Name != "Admin" && role.Name != "Instructor" && role.Name != "Student")
+                                            {
+                                                <form asp-action="DeleteRole" asp-route-roleName="@role.Name" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this role?');">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="3" class="text-center py-4 text-muted">No roles found.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

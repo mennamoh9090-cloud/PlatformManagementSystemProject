@@ -1,0 +1,21 @@
+﻿@model List<PlatformManagementSystem.MVC.ViewModels.Student.ExamScoreVM>
+
+<h2>My Exam Scores</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Exam</th>
+            <th>Score</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var score in Model)
+        {
+            <tr>
+                <td>@score.ExamTitle</td>
+                <td>@score.Score</td>
+            </tr>
+        }
+    </tbody>
+</table>

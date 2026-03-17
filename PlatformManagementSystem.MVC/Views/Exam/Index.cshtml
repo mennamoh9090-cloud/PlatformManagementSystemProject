@@ -1,0 +1,24 @@
+﻿@using PlatformManagementSystem.MVC.ViewModels.Exam
+@model List<ExamViewModel>
+
+<h2>Exams</h2>
+
+<a asp-action="Create" asp-route-courseId="@ViewBag.CourseId">
+    Add Exam
+</a>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var exam in Model)
+        {
+            <tr>
+                <td>@exam.Title</td>
+            </tr>
+        }
+    </tbody>
+</table>

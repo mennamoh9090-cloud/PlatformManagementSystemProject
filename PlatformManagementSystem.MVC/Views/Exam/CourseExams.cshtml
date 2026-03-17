@@ -1,0 +1,28 @@
+@model List<PlatformManagementSystem.MVC.ViewModels.Exam.ExamViewModel>
+
+<h2>Course Exams</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Date</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var exam in Model)
+        {
+            <tr>
+                <td>@exam.Title</td>
+                <td>@exam.ExamDate</td>
+                <td>
+                    <a asp-action="Solve" asp-route-examId="@exam.Id"
+                       class="btn btn-primary">
+                        Start Exam
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

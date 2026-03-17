@@ -1,0 +1,22 @@
+﻿@using PlatformManagementSystem.MVC.ViewModels.Enrollment
+@model List<StudentProgressViewModel>
+
+<h2>Students</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Progress</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var student in Model)
+        {
+            <tr>
+                <td>@student.FullName</td>
+                <td>@student.Progress %</td>
+            </tr>
+        }
+    </tbody>
+</table>

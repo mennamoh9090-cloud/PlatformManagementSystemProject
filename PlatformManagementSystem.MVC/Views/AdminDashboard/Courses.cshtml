@@ -1,0 +1,84 @@
+@using PlatformManagementSystem.MVC.ViewModels.Admin
+@model List<AdminCourseVM>
+
+<div class="row mb-4">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <h2 class="fw-bold m-0"><i class="bi bi-book-half me-2 text-primary"></i>Manage Courses</h2>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Course Title</th>
+                        <th>Instructor</th>
+                        <th>Status</th>
+                        <th>Students Enrolled</th>
+                        <th class="text-end pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var course in Model)
+                        {
+                            <tr>
+                                <td class="ps-4 fw-medium">@course.Title</td>
+                                <td>@course.InstructorName</td>
+                                <td>
+                                    @if(course.Status == PlatformManagementSystem.Domain.Enums.CourseStatus.Approved)
+                                    {
+                                        <span class="badge bg-success">Approved</span>
+                                    }
+                                    else if(course.Status == PlatformManagementSystem.Domain.Enums.CourseStatus.Pending)
+                                    {
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">Rejected</span>
+                                    }
+                                </td>
+                                <td>
+                                    <span class="badge bg-info text-dark">
+                                        <i class="bi bi-people-fill me-1"></i> @course.StudentsCount
+                                    </span>
+                                </td>
+                                <td class="text-end pe-4 d-flex justify-content-end gap-2 align-items-center">
+                                    @if(course.Status == PlatformManagementSystem.Domain.Enums.CourseStatus.Pending)
+                                    {
+                                        <form asp-action="ApproveCourse" asp-route-id="@course.Id" method="post" class="m-0">
+                                            <button type="submit" class="btn btn-sm btn-outline-success" title="Approve">
+                                                <i class="bi bi-check-circle"></i> Approve
+                                            </button>
+                                        </form>
+                                        <form asp-action="RejectCourse" asp-route-id="@course.Id" method="post" class="m-0">
+                                            <button type="submit" class="btn btn-sm btn-outline-warning" title="Reject">
+                                                <i class="bi bi-x-circle"></i> Reject
+                                            </button>
+                                        </form>
+                                    }
+                                    <a asp-action="DeleteCourse" asp-route-id="@course.Id" class="btn btn-sm btn-outline-danger" title="Delete Course" onclick="return confirm('Are you sure you want to delete this course? This action cannot be undone.');">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center py-4 text-muted">No courses found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,66 @@
+@model PlatformManagementSystem.MVC.ViewModels.Student.CourseDetailsVM
+@{
+    ViewData["Title"] = "Course Details";
+}
+
+<h2 class="mb-4">Course Details</h2>
+
+@{
+    var activeLiveSessionId = (int)(ViewBag.ActiveLiveSessionId ?? 0);
+}
+
+@if (activeLiveSessionId > 0)
+{
+    <div class="alert alert-success d-flex justify-content-between align-items-center">
+        <div>
+            <strong>Live session is active for this course.</strong>
+            <span class="ms-2">Join the live board to collaborate with your instructor.</span>
+        </div>
+        <a asp-controller="LiveSession"
+           asp-action="Board"
+           asp-route-sessionId="@activeLiveSessionId"
+           asp-route-courseId="@Model.CourseId"
+           class="btn btn-success">
+            Join Live Board
+        </a>
+    </div>
+}
+
+<div class="card course-card p-4 shadow-sm border-0 rounded-4">
+    <h4>@Model.CourseTitle</h4>
+    <p class="text-muted">Progress: @Model.ProgressPercentage%</p>
+
+    <hr />
+
+    <h5>Lessons</h5>
+
+    <ul class="list-group mb-3">
+        @if (Model.Lessons != null && Model.Lessons.Any())
+        {
+            @foreach (var lesson in Model.Lessons)
+            {
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>@lesson.LessonTitle</span>
+                    @if (lesson.IsCompleted)
+                    {
+                        <span class="badge bg-success">Completed</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Pending</span>
+                    }
+                </li>
+            }
+        }
+        else
+        {
+            <li class="list-group-item text-muted">No lessons available yet.</li>
+        }
+    </ul>
+</div>
+
+<a asp-action="Index"
+   asp-controller="StudentDashboard"
+   class="btn btn-secondary mt-3">
+    Back To Dashboard
+</a>

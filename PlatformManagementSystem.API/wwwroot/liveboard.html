@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Live Whiteboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+</head>
+<body>
+
+    <h2>Live Whiteboard</h2>
+
+    <canvas id="board" width="800" height="500"
+            style="border:1px solid black;"></canvas>
+
+    <br />
+    <button onclick="clearBoard()">Clear</button>
+
+    <script>
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/liveboardHub")
+        .build();
+
+    const canvas = document.getElementById("board");
+    const ctx = canvas.getContext("2d");
+
+    let drawing = false;
+    const sessionId = "course-1";
+
+    connection.start().then(() => {
+        console.log("Connected");
+        connection.invoke("JoinSessionGroup", 1);
+    });
+
+    canvas.addEventListener("mousedown", () => drawing = true);
+    canvas.addEventListener("mouseup", () => drawing = false);
+    canvas.addEventListener("mousemove", draw);
+
+    function draw(e) {
+        if (!drawing) return;
+
+        const data = {
+            x: e.offsetX,
+            y: e.offsetY
+        };
+
+        ctx.fillRect(data.x, data.y, 2, 2);
+
+        connection.invoke("Draw", 1, { type: "dot", x: data.x, y: data.y });
+    }
+
+    connection.on("ReceiveDraw", data => {
+        if (data.type === "clear") {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            return;
+        }
+        ctx.fillRect(data.x, data.y, 2, 2);
+    });
+
+    function clearBoard() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        connection.invoke("Draw", 1, { type: "clear" });
+    }
+    </script>
+
+</body>
+</html>

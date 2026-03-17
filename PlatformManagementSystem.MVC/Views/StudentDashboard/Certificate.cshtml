@@ -1,0 +1,122 @@
+﻿@model PlatformManagementSystem.MVC.ViewModels.Student.CourseCardVM
+
+<style>
+    .certificate-container {
+        width: 900px;
+        margin: 50px auto;
+        padding: 40px;
+        background: #fff;
+        border: 10px solid #0d6efd;
+        position: relative;
+        text-align: center;
+        font-family: 'Times New Roman', serif;
+    }
+
+    .certificate-container::before {
+        content: "";
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        right: 20px;
+        bottom: 20px;
+        border: 2px solid #0d6efd;
+    }
+
+    .certificate-title {
+        font-size: 40px;
+        font-weight: bold;
+        color: #0d6efd;
+        margin-bottom: 20px;
+    }
+
+    .certificate-subtitle {
+        font-size: 22px;
+        margin-bottom: 30px;
+    }
+
+    .student-name {
+        font-size: 32px;
+        font-weight: bold;
+        color: #198754;
+        margin: 20px 0;
+    }
+
+    .course-name {
+        font-size: 26px;
+        font-weight: bold;
+        color: #212529;
+    }
+
+    .certificate-footer {
+        margin-top: 50px;
+        display: flex;
+        justify-content: space-between;
+        padding: 0 50px;
+    }
+
+    .signature {
+        text-align: center;
+    }
+
+    .signature-line {
+        border-top: 1px solid #000;
+        width: 200px;
+        margin-top: 40px;
+    }
+
+    .print-btn {
+        margin-top: 30px;
+    }
+</style>
+
+<div class="certificate-container shadow-lg">
+
+    <div class="certificate-title">
+        CERTIFICATE OF COMPLETION
+    </div>
+
+    <div class="certificate-subtitle">
+        This certificate is proudly presented to
+    </div>
+
+    <div class="student-name">
+        @ViewBag.StudentName
+    </div>
+
+    <div>
+        For successfully completing the course
+    </div>
+
+    <div class="course-name mt-3">
+        @Model.CourseTitle
+    </div>
+
+    <div class="mt-4">
+        Date: @DateTime.Now.ToString("dd MMMM yyyy")
+    </div>
+
+    <div class="certificate-footer">
+        <div class="signature">
+            <div class="signature-line"></div>
+            Instructor Signature
+        </div>
+
+        <div class="signature">
+            <div class="signature-line"></div>
+            Director Signature
+        </div>
+    </div>
+
+</div>
+
+<div class="text-center print-btn">
+    <button onclick="window.print()" class="btn btn-primary">
+        Print Certificate
+    </button>
+
+    <a asp-action="Index"
+       asp-controller="StudentDashboard"
+       class="btn btn-dark">
+        Back to Dashboard
+    </a>
+</div>

@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "API + MVC",
+    "Projects": [
+      {
+        "Path": "PlatformManagementSystem.API\\PlatformManagementSystem.API.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "PlatformManagementSystem.MVC\\PlatformManagementSystem.MVC.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

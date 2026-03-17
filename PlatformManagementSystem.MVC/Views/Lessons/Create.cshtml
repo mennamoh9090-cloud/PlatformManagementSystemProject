@@ -1,0 +1,66 @@
+@using PlatformManagementSystem.MVC.ViewModels.Lesson
+@model CreateLessonViewModel
+
+@{
+    Layout = "_InstructorLayout";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+                <div class="card-header bg-primary text-white p-4 border-0">
+                    <h3 class="mb-0 fw-bold"><i class="bi bi-journal-plus me-2"></i>Create a New Lesson</h3>
+                    <p class="mb-0 text-white-50 mt-1">Add a new lesson to your course.</p>
+                </div>
+                
+                <div class="card-body p-4 p-md-5 bg-white">
+                    <form asp-action="Create" method="post">
+                        <input type="hidden" asp-for="CourseId" />
+                        
+                        <!-- Title Field -->
+                        <div class="form-floating mb-4">
+                            <input asp-for="Title" class="form-control bg-light border-0" id="floatingTitle" placeholder="Lesson Title" />
+                            <label for="floatingTitle" class="text-muted"><i class="bi bi-type me-1"></i> Lesson Title</label>
+                            <span asp-validation-for="Title" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <!-- Video URL Field -->
+                        <div class="form-floating mb-4">
+                            <input asp-for="VideoUrl" class="form-control bg-light border-0" id="floatingVideoUrl" placeholder="https://..." />
+                            <label for="floatingVideoUrl" class="text-muted"><i class="bi bi-play-btn me-1"></i> Video URL (Optional)</label>
+                            <span asp-validation-for="VideoUrl" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <!-- Content Field -->
+                        <div class="form-floating mb-5">
+                            <textarea asp-for="Content" class="form-control bg-light border-0" id="floatingContent" placeholder="Content" style="height: 150px"></textarea>
+                            <label for="floatingContent" class="text-muted"><i class="bi bi-text-paragraph me-1"></i> Lesson Content</label>
+                            <span asp-validation-for="Content" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <hr class="text-muted opacity-25 mb-4" />
+
+                        <!-- Actions -->
+                        <div class="d-flex gap-3 justify-content-end">
+                            <a asp-controller="InstructorDashboard" asp-action="ManageCourse" asp-route-courseId="@Model.CourseId" class="btn btn-light px-4 py-2 rounded-pill fw-medium">Cancel</a>
+                            <button type="submit" class="btn btn-primary px-5 py-2 rounded-pill fw-bold shadow-sm">
+                                <i class="bi bi-cloud-arrow-up me-2"></i>Publish Lesson
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <style>
+        .form-control:focus, .form-select:focus {
+            box-shadow: 0 0 0 .25rem rgba(13,110,253,.15);
+            background-color: #fff !important;
+        }
+    </style>
+}

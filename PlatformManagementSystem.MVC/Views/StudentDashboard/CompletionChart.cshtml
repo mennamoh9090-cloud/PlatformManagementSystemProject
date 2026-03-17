@@ -1,0 +1,23 @@
+﻿@model PlatformManagementSystem.MVC.ViewModels.Student.CompletionVM
+
+<h2>Completion Stats</h2>
+
+<canvas id="completionChart"></canvas>
+
+<script>
+    var ctx = document.getElementById('completionChart').getContext('2d');
+
+    var chartData = {
+        labels: ['Completed Courses', 'Total Courses'],
+        datasets: [{
+            label: 'Course Completion',
+            data: [@Model.Completed, @Model.TotalCourses],
+            backgroundColor: ['#4CAF50', '#FFEB3B']
+        }]
+    };
+
+    var chart = new Chart(ctx, {
+        type: 'doughnut',
+        data: chartData
+    });
+</script>

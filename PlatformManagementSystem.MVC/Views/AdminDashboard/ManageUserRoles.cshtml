@@ -1,0 +1,93 @@
+@model PlatformManagementSystem.MVC.ViewModels.Admin.ManageUserRolesVM
+
+@{
+    ViewData["Title"] = "Manage User Roles";
+}
+
+<div class="row mb-4">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="fw-bold m-0"><i class="bi bi-person-badge me-2 text-primary"></i>Manage User Roles</h2>
+            <p class="text-muted mt-2 mb-0">Modifying roles for <strong>@Model.FullName</strong></p>
+        </div>
+        <a asp-action="Users" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Back to Users
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Current Roles -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white border-0 pt-4 pb-0">
+                <h5 class="fw-bold">Current Roles</h5>
+            </div>
+            <div class="card-body">
+                @if (Model.UserRoles.Any())
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var role in Model.UserRoles)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <span><i class="bi bi-check-circle-fill text-success me-2"></i> @role</span>
+                                <form asp-action="RemoveRole" method="post" class="d-inline">
+                                    <input type="hidden" name="userId" value="@Model.UserId" />
+                                    <input type="hidden" name="roleName" value="@role" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Remove Role">
+                                        <i class="bi bi-x"></i> Remove
+                                    </button>
+                                </form>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="text-muted text-center my-4">This user has no roles assigned.</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Available Roles -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm border-0 h-100 bg-light">
+            <div class="card-header bg-transparent border-0 pt-4 pb-0">
+                <h5 class="fw-bold">Assign New Role</h5>
+            </div>
+            <div class="card-body">
+                @{
+                    var availableToAssign = Model.AvailableRoles.Where(r => !Model.UserRoles.Contains(r.Name)).ToList();
+                }
+
+                @if (availableToAssign.Any())
+                {
+                    <form asp-action="AssignRole" method="post">
+                        <input type="hidden" name="userId" value="@Model.UserId" />
+                        <div class="mb-3">
+                            <label for="roleName" class="form-label text-muted small">Select Role</label>
+                            <select class="form-select" id="roleName" name="roleName" required>
+                                <option value="" disabled selected>-- Choose a Role --</option>
+                                @foreach (var role in availableToAssign)
+                                {
+                                    <option value="@role.Name">@role.Name</option>
+                                }
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-plus-circle me-1"></i> Assign Role
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <div class="alert alert-success text-center mt-3 border-0">
+                        <i class="bi bi-info-circle mb-2 fs-3 d-block"></i>
+                        This user already has all available roles.
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

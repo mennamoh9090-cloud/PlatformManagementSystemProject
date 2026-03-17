@@ -1,0 +1,30 @@
+﻿@using PlatformManagementSystem.MVC.ViewModels.Course
+@model List<CourseViewModel>
+
+<h2>My Courses</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var course in Model)
+        {
+            <tr>
+                <td>@course.Title</td>
+                <td>
+                    <a asp-action="ViewStudents" asp-route-courseId="@course.Id" class="btn btn-primary">
+                        View Students
+                    </a>
+
+                    <a asp-action="ViewExams" asp-route-courseId="@course.Id" class="btn btn-warning">
+                        View Exams
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
