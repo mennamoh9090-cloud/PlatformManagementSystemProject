@@ -28,6 +28,23 @@ connection.on("ReceiveDraw", function (data) {
     drawFromEvent(data.type, JSON.stringify(data), false);
 });
 
+connection.on("ReceiveHistory", function (events) {
+    if (events && Array.isArray(events)) {
+        events.forEach(function (evt) {
+            try {
+                if (evt.eventType === "clear") {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    history = [];
+                } else if (evt.data) {
+                    drawFromEvent(evt.eventType, evt.data, false);
+                }
+            } catch (err) {
+                console.error("Failed to render historical stroke:", err);
+            }
+        });
+    }
+});
+
 canvas.addEventListener("mousedown", (e) => {
     drawing = true;
     startX = e.offsetX;

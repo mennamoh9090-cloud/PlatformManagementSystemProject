@@ -1,36 +1,75 @@
 @using PlatformManagementSystem.MVC.ViewModels.InstructorDashboard
 @model CourseDetailsVM
+@{
+    Layout = "_InstructorLayout";
+    ViewData["Title"] = "Manage Course - " + Model.Title;
+}
 
-<div class="container mt-5">
+<div class="container mt-4">
 
-    <h2>@Model.Title</h2>
-    <p>@Model.Description</p>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h2 class="fw-bold mb-1">@Model.Title</h2>
+            <p class="text-muted">@Model.Description</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-action="EditCourse" asp-route-courseId="@Model.Id" class="btn btn-warning">
+                <i class="bi bi-pencil"></i> Edit Details
+            </a>
+            <form asp-action="DeleteCourse" method="post" onsubmit="return confirm('Are you sure you want to delete this course? All lessons and exams will also be deleted.');">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="courseId" value="@Model.Id" />
+                <button type="submit" class="btn btn-outline-danger">Delete Course</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-4">
+        <a asp-controller="Lessons" asp-action="Index" asp-route-courseId="@Model.Id" class="btn btn-outline-primary">
+            Manage Lessons
+        </a>
+        <a asp-action="ViewExams" asp-route-courseId="@Model.Id" class="btn btn-outline-info">
+            Manage Exams
+        </a>
+        <a asp-action="ViewStudents" asp-route-courseId="@Model.Id" class="btn btn-outline-secondary">
+            Enrolled Students
+        </a>
+        <a asp-controller="LiveSession" asp-action="ByCourse" asp-route-courseId="@Model.Id" class="btn btn-outline-success">
+            Live Classroom Sessions
+        </a>
+    </div>
 
     <hr />
 
-    <h4>Lessons</h4>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0">Lessons in this Course</h4>
+        <a asp-controller="Lessons" asp-action="Create" asp-route-courseId="@Model.Id" class="btn btn-primary btn-sm">
+            + Add New Lesson
+        </a>
+    </div>
 
-    <a asp-controller="Lessons"
-       asp-action="Create"
-       asp-route-courseId="@Model.Id"
-       class="btn btn-primary mb-3">
-        Add Lesson
-    </a>
-
-    <a asp-controller="LiveSession"
-       asp-action="ByCourse"
-       asp-route-courseId="@Model.Id"
-       class="btn btn-outline-success mb-3 ms-2">
-        Live Sessions
-    </a>
-
-    <ul class="list-group">
-        @foreach (var lesson in Model.Lessons)
-        {
-            <li class="list-group-item">
-                @lesson.Title
-            </li>
-        }
-    </ul>
+    @if (Model.Lessons == null || !Model.Lessons.Any())
+    {
+        <div class="alert alert-info">No lessons added yet. Click "+ Add New Lesson" to begin creating content.</div>
+    }
+    else
+    {
+        <ul class="list-group shadow-sm">
+            @for (int i = 0; i < Model.Lessons.Count; i++)
+            {
+                var lesson = Model.Lessons[i];
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span><strong>#@(i + 1)</strong> @lesson.Title</span>
+                    <div class="btn-group btn-group-sm">
+                        <a asp-controller="Lessons" asp-action="Edit" asp-route-id="@lesson.Id" asp-route-courseId="@Model.Id" class="btn btn-outline-secondary">Edit</a>
+                        <form asp-controller="Lessons" asp-action="Delete" asp-route-id="@lesson.Id" asp-route-courseId="@Model.Id" method="post" onsubmit="return confirm('Delete this lesson?');" style="display:inline;">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                        </form>
+                    </div>
+                </li>
+            }
+        </ul>
+    }
 
 </div>

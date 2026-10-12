@@ -107,4 +107,46 @@ public class AdminDashboardController : Controller
         await client.DeleteAsync($"Admin/DeleteUser/{id}");
         return RedirectToAction(nameof(Users));
     }
+
+    [HttpPost]
+    public async Task<IActionResult> ApproveCourse(int id)
+    {
+        var client = _httpClientFactory.CreateClient("API");
+        var token = HttpContext.Session.GetString("UserToken");
+
+        if (!string.IsNullOrEmpty(token))
+        {
+            client.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+        }
+
+        var response = await client.PutAsync($"Course/Approve/{id}", null);
+        if (response.IsSuccessStatusCode)
+            TempData["Success"] = "Course approved successfully!";
+        else
+            TempData["Error"] = "Failed to approve course.";
+
+        return RedirectToAction(nameof(Courses));
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> RejectCourse(int id)
+    {
+        var client = _httpClientFactory.CreateClient("API");
+        var token = HttpContext.Session.GetString("UserToken");
+
+        if (!string.IsNullOrEmpty(token))
+        {
+            client.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+        }
+
+        var response = await client.PutAsync($"Course/Reject/{id}", null);
+        if (response.IsSuccessStatusCode)
+            TempData["Success"] = "Course rejected.";
+        else
+            TempData["Error"] = "Failed to reject course.";
+
+        return RedirectToAction(nameof(Courses));
+    }
 }

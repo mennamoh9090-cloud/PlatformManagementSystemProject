@@ -1,32 +1,58 @@
-﻿@using PlatformManagementSystem.MVC.ViewModels.Lesson
+@using PlatformManagementSystem.MVC.ViewModels.Lesson
 @model List<LessonViewModel>
+@{
+    Layout = "_InstructorLayout";
+    ViewData["Title"] = "Lessons";
+}
 
-<h2>Lessons</h2>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Lessons</h2>
+        <div>
+            <a asp-action="Create" asp-route-courseId="@ViewBag.CourseId" class="btn btn-primary btn-sm">
+                + Add Lesson
+            </a>
+            <a asp-controller="InstructorDashboard" asp-action="ManageCourse" asp-route-courseId="@ViewBag.CourseId" class="btn btn-outline-secondary btn-sm ms-2">
+                Back to Course
+            </a>
+        </div>
+    </div>
 
-<a asp-action="Create" asp-route-courseId="@ViewBag.CourseId">
-    Add Lesson
-</a>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var lesson in Model)
-        {
-            <tr>
-                <td>@lesson.Title</td>
-                <td>
-                    <a asp-action="Delete"
-                       asp-route-id="@lesson.Id"
-                       asp-route-courseId="@ViewBag.CourseId">
-                        Delete
-                    </a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info">No lessons created yet.</div>
+    }
+    else
+    {
+        <div class="table-responsive shadow-sm">
+            <table class="table table-hover align-middle mb-0 bg-white">
+                <thead class="table-dark">
+                    <tr>
+                        <th style="width: 60px;">#</th>
+                        <th>Title</th>
+                        <th class="text-end" style="width: 200px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Count; i++)
+                    {
+                        var lesson = Model[i];
+                        <tr>
+                            <td><strong>@(i + 1)</strong></td>
+                            <td class="fw-semibold">@lesson.Title</td>
+                            <td class="text-end">
+                                <a asp-action="Edit" asp-route-id="@lesson.Id" asp-route-courseId="@ViewBag.CourseId" class="btn btn-sm btn-outline-secondary">
+                                    Edit
+                                </a>
+                                <form asp-action="Delete" asp-route-id="@lesson.Id" asp-route-courseId="@ViewBag.CourseId" method="post" onsubmit="return confirm('Delete this lesson?');" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

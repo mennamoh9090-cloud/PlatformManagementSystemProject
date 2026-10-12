@@ -52,6 +52,17 @@ public class ApiService : IApiService
             });
     }
 
+    public async Task<byte[]?> GetByteArrayAsync(string url)
+    {
+        var client = CreateClientWithToken();
+        var response = await client.GetAsync(url);
+
+        if (!response.IsSuccessStatusCode)
+            return null;
+
+        return await response.Content.ReadAsByteArrayAsync();
+    }
+
     public async Task<bool> PostAsync<T>(string url, T data)
     {
         var client = CreateClientWithToken();

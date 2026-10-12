@@ -88,10 +88,116 @@
 
     <hr class="my-5" />
 
-    <div class="instructor-box p-4 shadow rounded">
-        <h4>Instructor</h4>
-        <h5>@Model.InstructorName</h5>
-        <p>@Model.InstructorBio</p>
+    <div class="instructor-box p-4 shadow rounded mb-5">
+        <h4 class="text-primary mb-2"><i class="bi bi-person-workspace"></i> Instructor</h4>
+        <h5 class="fw-bold">@Model.InstructorName</h5>
+        <p class="text-muted mb-0">@Model.InstructorBio</p>
+    </div>
+
+    <!-- Student Reviews Section -->
+    <div class="reviews-section mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="fw-bold mb-0">
+                <i class="bi bi-star-half text-warning"></i> Student Reviews & Ratings
+            </h3>
+            <span class="badge bg-warning text-dark fs-6 px-3 py-2">
+                ★ @Model.Rating / 5.0 (@(Model.Reviews?.Count ?? 0) reviews)
+            </span>
+        </div>
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <!-- Review Form (Only for enrolled students) -->
+        @if (Model.IsEnrolled)
+        {
+            <div class="card shadow-sm border-0 mb-4 bg-light">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-pencil-square"></i> Leave a Review</h5>
+                    <form asp-action="AddReview" asp-controller="Courses" method="post">
+                        <input type="hidden" name="courseId" value="@Model.Id" />
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Rating</label>
+                                <select name="rating" class="form-select" required>
+                                    <option value="5">⭐⭐⭐⭐⭐ (5 - Excellent)</option>
+                                    <option value="4">⭐⭐⭐⭐ (4 - Very Good)</option>
+                                    <option value="3">⭐⭐⭐ (3 - Good)</option>
+                                    <option value="2">⭐⭐ (2 - Fair)</option>
+                                    <option value="1">⭐ (1 - Poor)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-9">
+                                <label class="form-label fw-bold">Feedback / Comment</label>
+                                <textarea name="comment" class="form-control" rows="2" placeholder="Share your experience with this course..." required></textarea>
+                            </div>
+                            <div class="col-12 text-end">
+                                <button type="submit" class="btn btn-primary px-4">
+                                    <i class="bi bi-send"></i> Submit Review
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        }
+
+        <!-- Reviews List -->
+        @if (Model.Reviews != null && Model.Reviews.Any())
+        {
+            <div class="row g-3">
+                @foreach (var review in Model.Reviews)
+                {
+                    <div class="col-md-6">
+                        <div class="card h-100 shadow-sm border-0">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="fw-bold mb-0 text-primary">
+                                        <i class="bi bi-person-circle"></i> @review.StudentName
+                                    </h6>
+                                    <div>
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            if (i <= review.Rating)
+                                            {
+                                                <span class="text-warning">★</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">☆</span>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                                <p class="card-text text-secondary mb-2">@review.Comment</p>
+                                <small class="text-muted">
+                                    <i class="bi bi-clock"></i> @review.CreatedAt.ToString("MMM dd, yyyy")
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-4 bg-light rounded text-muted">
+                <i class="bi bi-chat-left-quote fs-3 d-block mb-2"></i>
+                No reviews yet. Be the first to review this course!
+            </div>
+        }
     </div>
 
 </div>

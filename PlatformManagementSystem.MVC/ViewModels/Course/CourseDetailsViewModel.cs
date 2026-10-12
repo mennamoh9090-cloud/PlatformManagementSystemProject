@@ -1,4 +1,4 @@
-﻿using PlatformManagementSystem.MVC.ViewModels.Course;
+using PlatformManagementSystem.MVC.ViewModels.Course;
 
 public class CourseDetailsViewModel
 {
@@ -16,5 +16,15 @@ public class CourseDetailsViewModel
 
     public bool IsEnrolled { get; set; }
 
-    public List<LessonItemVM> Lessons { get; set; }
+    public List<LessonItemVM> Lessons { get; set; } = new();
+    public List<ReviewItemVM> Reviews { get; set; } = new();
+}
+
+public class ReviewItemVM
+{
+    public int Id { get; set; }
+    public int Rating { get; set; }
+    public string Comment { get; set; } = string.Empty;
+    public string StudentName { get; set; } = string.Empty;
+    public DateTime CreatedAt { get; set; }
 }

@@ -66,6 +66,46 @@ public class LessonController : ControllerBase
         return Ok();
     }
 
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(int id)
+    {
+        var lesson = await _unitOfWork.Lessons.GetByIdAsync(id);
+        if (lesson == null)
+            return NotFound();
+
+        return Ok(new
+        {
+            lesson.Id,
+            lesson.CourseId,
+            lesson.Title,
+            lesson.Content
+        });
+    }
+
+    [Authorize(Roles = "Instructor")]
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(int id, [FromBody] UpdateLessonRequest request)
+    {
+        var lesson = await _unitOfWork.Lessons.GetByIdAsync(id);
+        if (lesson == null)
+            return NotFound("Lesson not found");
+
+        lesson.Title = request.Title ?? lesson.Title;
+        lesson.Content = request.Content ?? lesson.Content;
+        lesson.UpdatedAt = DateTime.UtcNow;
+
+        _unitOfWork.Lessons.Update(lesson);
+        await _unitOfWork.SaveChangesAsync();
+
+        return Ok(new { message = "Lesson updated successfully" });
+    }
+
+    public sealed class UpdateLessonRequest
+    {
+        public string? Title { get; set; }
+        public string? Content { get; set; }
+    }
+
     public sealed class CreateLessonRequest
     {
         public int CourseId { get; set; }

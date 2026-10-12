@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using PlatformManagementSystem.Application.Interfaces;
 using PlatformManagementSystem.Infrastructure.Persistence;
 using System.Linq.Expressions;
@@ -59,7 +59,7 @@ namespace PlatformManagementSystem.Infrastructure.Repositories
 
         public void Remove(T entity)
         {
-            throw new NotImplementedException();
+            _dbSet.Remove(entity);
         }
     }
 }

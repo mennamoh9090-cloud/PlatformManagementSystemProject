@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -152,10 +152,14 @@ public class AdminController : ControllerBase
     {
         var courses = await _context.Courses
             .Include(c => c.Enrollments)
+            .Include(c => c.Instructor)
             .Select(c => new
             {
                 c.Id,
                 c.Title,
+                InstructorName = c.Instructor != null ? (c.Instructor.FullName ?? c.Instructor.UserName) : "N/A",
+                Status = (int)c.Status,
+                StatusName = c.Status.ToString(),
                 StudentsCount = c.Enrollments.Count
             })
             .ToListAsync();

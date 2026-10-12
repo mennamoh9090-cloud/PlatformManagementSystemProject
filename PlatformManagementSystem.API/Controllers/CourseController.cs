@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PlatformManagementSystem.Application.DTOs.Course;
@@ -131,20 +131,116 @@ namespace PlatformManagementSystem.API.Controllers
             if (course == null)
                 return NotFound();
 
+            var reviews = await _context.Reviews
+                .Include(r => r.Student)
+                .Where(r => r.CourseId == id)
+                .OrderByDescending(r => r.CreatedAt)
+                .ToListAsync();
+
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var isEnrolled = !string.IsNullOrEmpty(currentUserId) &&
+                             course.Enrollments.Any(e => e.StudentId == currentUserId);
+
+            var avgRating = reviews.Any() ? Math.Round(reviews.Average(r => r.Rating), 1) : 0.0;
+
             return Ok(new
             {
                 course.Id,
                 course.Title,
                 course.Description,
+                course.ThumbnailUrl,
                 course.Price,
-                InstructorName = course.Instructor.FullName,
+                InstructorName = course.Instructor?.FullName ?? "Instructor",
+                InstructorBio = "Expert Instructor",
                 StudentsCount = course.Enrollments.Count,
+                Rating = avgRating,
+                IsEnrolled = isEnrolled,
+                Reviews = reviews.Select(r => new
+                {
+                    r.Id,
+                    r.Rating,
+                    r.Comment,
+                    StudentName = r.Student?.FullName ?? r.Student?.UserName ?? "Student",
+                    r.CreatedAt
+                }),
                 Lessons = course.Lessons.Select(l => new
                 {
                     l.Id,
                     l.Title
                 })
             });
+        }
+
+        // Update Course
+        [Authorize(Roles = "Instructor")]
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateCourse(int id, [FromBody] CreateCourseDto dto)
+        {
+            var instructorId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(instructorId))
+                return Unauthorized();
+
+            try
+            {
+                await _courseService.UpdateAsync(id, dto, instructorId);
+                return Ok(new { message = "Course updated successfully" });
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbid();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        // Delete Course
+        [Authorize(Roles = "Instructor,Admin")]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteCourse(int id)
+        {
+            try
+            {
+                await _courseService.DeleteAsync(id);
+                return Ok(new { message = "Course deleted successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        // Approve Course (Admin)
+        [Authorize(Roles = "Admin")]
+        [HttpPut("Approve/{id}")]
+        public async Task<IActionResult> ApproveCourse(int id)
+        {
+            try
+            {
+                await _courseService.ApproveCourseAsync(id);
+                return Ok(new { message = "Course approved successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        // Reject Course (Admin)
+        [Authorize(Roles = "Admin")]
+        [HttpPut("Reject/{id}")]
+        public async Task<IActionResult> RejectCourse(int id)
+        {
+            try
+            {
+                await _courseService.RejectCourseAsync(id);
+                return Ok(new { message = "Course rejected successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
     }
 }

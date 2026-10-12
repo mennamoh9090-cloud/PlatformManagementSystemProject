@@ -25,7 +25,16 @@ public class DashboardService : IDashboardService
         if (enrollment == null || !enrollment.IsCompleted)
             return null;
 
-        return null;
+        var student = await _userManager.FindByIdAsync(studentId);
+        var course = await _unitOfWork.Courses.GetByIdAsync(courseId);
+
+        var studentName = student?.FullName ?? student?.UserName ?? "Student";
+        var courseTitle = course?.Title ?? "Course";
+        var date = DateTime.UtcNow;
+        var safeSub = studentId.Length >= 8 ? studentId.Substring(0, 8) : studentId;
+        var certId = $"CERT-{courseId}-{safeSub.ToUpper()}-{date:yyyyMMdd}";
+
+        return PlatformManagementSystem.Application.Common.SimplePdfGenerator.GenerateCertificate(studentName, courseTitle, date, certId);
     }
 
     public async Task<object> GetAdminDashboardAsync()

@@ -137,6 +137,19 @@ public class StudentDashboardController : Controller
         });
     }
 
+    [HttpGet("DownloadCertificate/{courseId}")]
+    public async Task<IActionResult> DownloadCertificate(int courseId)
+    {
+        var pdfBytes = await _apiService.GetByteArrayAsync($"Dashboard/GenerateCertificate/{courseId}");
+        if (pdfBytes == null || pdfBytes.Length == 0)
+        {
+            TempData["ErrorMessage"] = "Certificate is not available or course is not completed yet.";
+            return RedirectToAction("Certificate", new { courseId });
+        }
+
+        return File(pdfBytes, "application/pdf", $"Certificate_Course_{courseId}.pdf");
+    }
+
     private sealed class StudentStatsResponse
     {
         public int TotalCourses { get; set; }

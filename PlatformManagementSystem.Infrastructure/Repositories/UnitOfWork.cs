@@ -26,6 +26,7 @@ public class UnitOfWork : IUnitOfWork
     public IGenericRepository<StudentLessonProgress> StudentLessonProgresses { get; }
 
     public IGenericRepository<WhiteboardEvent> WhiteboardEvents { get; }
+    public IGenericRepository<Review> Reviews { get; }
 
     public IGenericRepository<Lesson> Lessons { get; }
 
@@ -46,6 +47,7 @@ public class UnitOfWork : IUnitOfWork
         LiveSessionAttendances = new GenericRepository<LiveSessionAttendance>(_context);
         StudentLessonProgresses = new GenericRepository<StudentLessonProgress>(_context);
         WhiteboardEvents = new GenericRepository<WhiteboardEvent>(_context);
+        Reviews = new GenericRepository<Review>(_context);
         Lessons = new GenericRepository<Lesson>(_context);
 
     }

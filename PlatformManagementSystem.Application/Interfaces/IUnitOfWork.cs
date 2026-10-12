@@ -1,4 +1,4 @@
-﻿using PlatformManagementSystem.Application.Interfaces;
+using PlatformManagementSystem.Application.Interfaces;
 using PlatformManagementSystem.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -27,6 +27,7 @@ public interface IUnitOfWork : IDisposable
     IGenericRepository<StudentAnswer> StudentAnswers { get; }
     IGenericRepository<StudentLessonProgress> StudentLessonProgresses { get; }
     IGenericRepository<WhiteboardEvent> WhiteboardEvents { get; }
+    IGenericRepository<Review> Reviews { get; }
 
     IGenericRepository<Lesson> Lessons { get; }
 

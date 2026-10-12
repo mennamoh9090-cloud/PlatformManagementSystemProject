@@ -1,4 +1,4 @@
-﻿using PlatformManagementSystem.Application.DTOs.Auth;
+using PlatformManagementSystem.Application.DTOs.Auth;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +9,6 @@ namespace PlatformManagementSystem.Application.Interfaces.Services
 {
     public interface IAuthService
     {
-        Task<LoginResponseDto> LoginAsync(LoginDto model);
+        Task<LoginResponseDto?> LoginAsync(LoginDto model);
     }
 }

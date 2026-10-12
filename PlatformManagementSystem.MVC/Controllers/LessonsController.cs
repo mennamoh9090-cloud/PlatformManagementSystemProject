@@ -75,6 +75,46 @@ namespace PlatformManagementSystem.MVC.Controllers
 
             return RedirectToAction("Index", new { courseId });
         }
+
+        // GET: Edit
+        public async Task<IActionResult> Edit(int id, int courseId)
+        {
+            var token = HttpContext.Session.GetString("UserToken");
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            var response = await _httpClient.GetAsync($"Lesson/{id}");
+            if (!response.IsSuccessStatusCode)
+                return RedirectToAction("Index", new { courseId });
+
+            var json = await response.Content.ReadAsStringAsync();
+            var lesson = JsonConvert.DeserializeObject<CreateLessonViewModel>(json);
+            if (lesson == null)
+                return RedirectToAction("Index", new { courseId });
+
+            lesson.CourseId = courseId;
+            return View(lesson);
+        }
+
+        // POST: Edit
+        [HttpPost]
+        public async Task<IActionResult> Edit(CreateLessonViewModel model)
+        {
+            var token = HttpContext.Session.GetString("UserToken");
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            var content = new StringContent(
+                JsonConvert.SerializeObject(new { title = model.Title, content = model.Content }),
+                Encoding.UTF8,
+                "application/json");
+
+            var response = await _httpClient.PutAsync($"Lesson/{model.Id}", content);
+            if (response.IsSuccessStatusCode)
+                return RedirectToAction("Index", new { courseId = model.CourseId });
+
+            return View(model);
+        }
     }
 }
 

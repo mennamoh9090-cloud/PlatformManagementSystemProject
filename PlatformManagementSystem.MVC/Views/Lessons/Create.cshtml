@@ -1,18 +1,38 @@
-﻿@using PlatformManagementSystem.MVC.ViewModels.Lesson
+@using PlatformManagementSystem.MVC.ViewModels.Lesson
 @model CreateLessonViewModel
+@{
+    Layout = "_InstructorLayout";
+    ViewData["Title"] = "Create Lesson";
+}
 
-<form asp-action="Create" method="post">
-    <input type="hidden" asp-for="CourseId" />
+<div class="container mt-4" style="max-width: 700px;">
+    <div class="card shadow-sm p-4">
+        <h4 class="mb-3">Create New Lesson</h4>
 
-    <div>
-        <label asp-for="Title"></label>
-        <input asp-for="Title" />
+        <form asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="CourseId" />
+
+            <div class="mb-3">
+                <label asp-for="Title" class="form-label">Lesson Title</label>
+                <input asp-for="Title" class="form-control" required />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Content" class="form-label">Lesson Content</label>
+                <textarea asp-for="Content" class="form-control" rows="8" placeholder="Enter lesson notes, markdown, or resource links..." required></textarea>
+                <span asp-validation-for="Content" class="text-danger"></span>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary flex-grow-1">Save Lesson</button>
+                <a asp-action="Index" asp-route-courseId="@Model.CourseId" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
     </div>
+</div>
 
-    <div>
-        <label asp-for="Content"></label>
-        <textarea asp-for="Content"></textarea>
-    </div>
-
-    <button type="submit">Save</button>
-</form>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

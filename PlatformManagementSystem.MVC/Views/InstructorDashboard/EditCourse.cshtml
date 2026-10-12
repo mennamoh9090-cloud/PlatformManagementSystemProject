@@ -1,0 +1,46 @@
+@model PlatformManagementSystem.MVC.ViewModels.InstructorDashboard.CreateCourseVM
+@{
+    Layout = "_InstructorLayout";
+    ViewData["Title"] = "Edit Course";
+}
+
+<div class="card p-4 shadow-sm" style="max-width:600px; margin:auto;">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="mb-0">Edit Course</h4>
+        <a asp-action="ManageCourse" asp-route-courseId="@Model.Id" class="btn btn-outline-secondary btn-sm">Back</a>
+    </div>
+
+    <form asp-action="EditCourse" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+
+        <div class="mb-3">
+            <label class="form-label">Course Title</label>
+            <input asp-for="Title" class="form-control" required />
+            <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea asp-for="Description" class="form-control" rows="4" required></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Price ($)</label>
+            <input asp-for="Price" type="number" step="0.01" min="0" class="form-control" />
+            <span asp-validation-for="Price" class="text-danger"></span>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary flex-grow-1">Save Changes</button>
+            <a asp-action="ManageCourse" asp-route-courseId="@Model.Id" class="btn btn-secondary">Cancel</a>
+        </div>
+
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

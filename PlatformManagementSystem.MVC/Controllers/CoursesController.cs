@@ -35,6 +35,13 @@ public class CoursesController : Controller
     {
         var client = _httpClientFactory.CreateClient("API");
 
+        var token = HttpContext.Session.GetString("UserToken");
+        if (!string.IsNullOrWhiteSpace(token))
+        {
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
+        }
+
         var response = await client.GetAsync($"Course/details/{id}");
 
         if (!response.IsSuccessStatusCode)
@@ -55,6 +62,36 @@ public class CoursesController : Controller
         return View(course);
     }
 
+    // ================== REVIEWS ==================
+    [HttpPost]
+    public async Task<IActionResult> AddReview(int courseId, int rating, string comment)
+    {
+        var client = _httpClientFactory.CreateClient("API");
+        var token = HttpContext.Session.GetString("UserToken");
+        if (string.IsNullOrWhiteSpace(token))
+            return RedirectToAction("Login", "Account");
+
+        client.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", token);
+
+        var reviewDto = new { CourseId = courseId, Rating = rating, Comment = comment };
+        var json = JsonSerializer.Serialize(reviewDto);
+        var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+
+        var response = await client.PostAsync("Review", content);
+        if (!response.IsSuccessStatusCode)
+        {
+            var err = await response.Content.ReadAsStringAsync();
+            TempData["Error"] = "Could not submit review: " + err;
+        }
+        else
+        {
+            TempData["Success"] = "Review submitted successfully!";
+        }
+
+        return RedirectToAction("Details", new { id = courseId });
+    }
+
     // ================== ENROLL ==================
     [HttpPost]
     public async Task<IActionResult> Enroll(int courseId)
@@ -72,5 +109,36 @@ public class CoursesController : Controller
         await client.PostAsync($"Enrollment/{courseId}", null);
 
         return RedirectToAction("Details", new { id = courseId });
+    }
+
+    // ================== ROLE REDIRECTS ==================
+    [HttpGet]
+    public IActionResult Create()
+    {
+        if (User.IsInRole("Instructor") || User.IsInRole("Admin"))
+            return RedirectToAction("CreateCourse", "InstructorDashboard");
+
+        return RedirectToAction("Index");
+    }
+
+    [HttpGet]
+    public IActionResult Edit(int id)
+    {
+        if (User.IsInRole("Instructor") || User.IsInRole("Admin"))
+            return RedirectToAction("EditCourse", "InstructorDashboard", new { id });
+
+        return RedirectToAction("Index");
+    }
+
+    [HttpGet]
+    public IActionResult MyCourses()
+    {
+        if (User.IsInRole("Instructor"))
+            return RedirectToAction("MyCourses", "InstructorDashboard");
+
+        if (User.IsInRole("Student"))
+            return RedirectToAction("Index", "StudentDashboard");
+
+        return RedirectToAction("Index");
     }
 }

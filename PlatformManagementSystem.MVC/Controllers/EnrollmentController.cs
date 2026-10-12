@@ -1,41 +1,28 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PlatformManagementSystem.Domain.Entities;
-using PlatformManagementSystem.Infrastructure.Persistence;
 
 [Authorize(Roles = "Student")]
-public class EnrollmentsController(ApplicationDbContext context,
-                             UserManager<ApplicationUser> userManager) : Controller
+public class EnrollmentsController : Controller
 {
-    private readonly ApplicationDbContext _context = context;
-    private readonly UserManager<ApplicationUser> _userManager = userManager;
+    private readonly IApiService _apiService;
+
+    public EnrollmentsController(IApiService apiService)
+    {
+        _apiService = apiService;
+    }
 
     [HttpPost]
     public async Task<IActionResult> Enroll(int courseId)
     {
-        var user = await _userManager.GetUserAsync(User);
+        var success = await _apiService.PostAsync<object?>($"Enrollment/{courseId}", null);
 
-        var exists = _context.Enrollments
-            .Any(e => e.CourseId == courseId && e.StudentId == user.Id);
-
-        if (exists)
+        if (!success)
         {
-            TempData["Error"] = "You already enrolled in this course.";
-            return RedirectToAction("Index", "Courses");
+            TempData["Error"] = "Enrollment failed or you are already enrolled in this course.";
+            return RedirectToAction("Details", "Courses", new { id = courseId });
         }
 
-        var enrollment = new Enrollment
-        {
-            CourseId = courseId,
-            StudentId = user.Id
-        };
-
-        _context.Enrollments.Add(enrollment);
-        await _context.SaveChangesAsync();
-
         TempData["Success"] = "Enrollment successful!";
-        return RedirectToAction("Index", "Courses");
+        return RedirectToAction("CourseDetails", "StudentDashboard", new { courseId });
     }
 }
-

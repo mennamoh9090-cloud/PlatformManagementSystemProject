@@ -1,30 +1,60 @@
-﻿@using PlatformManagementSystem.MVC.ViewModels.Course
+@using PlatformManagementSystem.MVC.ViewModels.Course
 @model List<CourseViewModel>
+@{
+    Layout = "_InstructorLayout";
+    ViewData["Title"] = "My Courses";
+}
 
-<h2>My Courses</h2>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>My Courses</h2>
+        <a asp-action="CreateCourse" class="btn btn-dark">+ Create Course</a>
+    </div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var course in Model)
-        {
-            <tr>
-                <td>@course.Title</td>
-                <td>
-                    <a asp-action="ViewStudents" asp-route-courseId="@course.Id" class="btn btn-primary">
-                        View Students
-                    </a>
-
-                    <a asp-action="ViewExams" asp-route-courseId="@course.Id" class="btn btn-warning">
-                        View Exams
-                    </a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info">You have not created any courses yet.</div>
+    }
+    else
+    {
+        <div class="table-responsive shadow-sm">
+            <table class="table table-hover align-middle mb-0 bg-white">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var course in Model)
+                    {
+                        <tr>
+                            <td class="fw-bold">@course.Title</td>
+                            <td class="text-muted small" style="max-width: 300px;">@course.Description</td>
+                            <td class="text-end">
+                                <a asp-action="ManageCourse" asp-route-courseId="@course.Id" class="btn btn-sm btn-outline-dark">
+                                    Manage
+                                </a>
+                                <a asp-action="EditCourse" asp-route-courseId="@course.Id" class="btn btn-sm btn-outline-warning">
+                                    Edit
+                                </a>
+                                <a asp-action="ViewStudents" asp-route-courseId="@course.Id" class="btn btn-sm btn-outline-primary">
+                                    Students
+                                </a>
+                                <a asp-action="ViewExams" asp-route-courseId="@course.Id" class="btn btn-sm btn-outline-info">
+                                    Exams
+                                </a>
+                                <form asp-action="DeleteCourse" method="post" onsubmit="return confirm('Delete this course?');" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="courseId" value="@course.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

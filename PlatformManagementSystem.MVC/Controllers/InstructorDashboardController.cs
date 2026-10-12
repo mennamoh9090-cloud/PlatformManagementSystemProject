@@ -146,11 +146,75 @@ public class InstructorDashboardController : Controller
         return View(model);
     }
 
+    [HttpGet]
+    public async Task<IActionResult> EditCourse(int courseId)
+    {
+        var details = await _apiService.GetAsync<CourseDetailsResponse>($"Course/details/{courseId}");
+        if (details == null)
+            return RedirectToAction(nameof(MyCourses));
+
+        var model = new CreateCourseVM
+        {
+            Id = details.Id,
+            Title = details.Title ?? string.Empty,
+            Description = details.Description ?? string.Empty,
+            Price = details.Price,
+            CategoryId = details.CategoryId
+        };
+
+        return View(model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditCourse(CreateCourseVM model)
+    {
+        if (!ModelState.IsValid)
+            return View(model);
+
+        var dto = new
+        {
+            Title = model.Title,
+            Description = model.Description,
+            Price = model.Price,
+            CategoryId = model.CategoryId
+        };
+
+        var success = await _apiService.PutAsync($"Course/{model.Id}", dto);
+        if (!success)
+        {
+            TempData["Error"] = "Failed to update course.";
+            return View(model);
+        }
+
+        TempData["Success"] = "Course updated successfully!";
+        return RedirectToAction(nameof(ManageCourse), new { courseId = model.Id });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteCourse(int courseId)
+    {
+        var success = await _apiService.DeleteAsync($"Course/{courseId}");
+        if (!success)
+        {
+            TempData["Error"] = "Failed to delete course.";
+        }
+        else
+        {
+            TempData["Success"] = "Course deleted successfully!";
+        }
+
+        return RedirectToAction(nameof(MyCourses));
+    }
+
     private sealed class CourseDetailsResponse
     {
         public int Id { get; set; }
         public string? Title { get; set; }
         public string? Description { get; set; }
+        public decimal Price { get; set; }
+        public int CategoryId { get; set; }
         public List<LessonResponse>? Lessons { get; set; }
     }
 
