@@ -59,7 +59,7 @@ namespace PlatformManagementSystem.MVC.Controllers
             var response = await _httpClient.PostAsync("Lesson", content);
 
             if (response.IsSuccessStatusCode)
-                return RedirectToAction("ManageCourse", "InstructorDashboard", new { courseId = model.CourseId });
+                return RedirectToAction("Index", new { courseId = model.CourseId });
 
             return View(model);
         }

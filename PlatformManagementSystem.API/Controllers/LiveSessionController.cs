@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using PlatformManagementSystem.Application.Interfaces;
 using PlatformManagementSystem.Application.Interfaces.Services;
 using PlatformManagementSystem.API.Hubs;
 using System.Security.Claims;
@@ -12,16 +11,13 @@ public class LiveSessionController : ControllerBase
 {
     private readonly ILiveSessionService _liveService;
     private readonly IHubContext<LiveSessionHub> _hub;
-    private readonly IUnitOfWork _unitOfWork;
 
     public LiveSessionController(
         ILiveSessionService liveService,
-        IHubContext<LiveSessionHub> hub,
-        IUnitOfWork unitOfWork)
+        IHubContext<LiveSessionHub> hub)
     {
         _liveService = liveService;
         _hub = hub;
-        _unitOfWork = unitOfWork;
     }
 
     // Create Session
@@ -69,19 +65,5 @@ public class LiveSessionController : ControllerBase
     {
         await _liveService.EndSessionAsync(id);
         return Ok();
-    }
-
-    /// <summary>Get saved whiteboard events for a session (replay on load).</summary>
-    [HttpGet("WhiteboardHistory/{sessionId}")]
-    public async Task<IActionResult> WhiteboardHistory(int sessionId)
-    {
-        var events = await _unitOfWork.WhiteboardEvents
-            .FindAsync(e => e.LiveSessionId == sessionId);
-        var list = events
-            .OrderBy(e => e.CreatedAt)
-            .Where(e => e.EventType == "Draw" && !string.IsNullOrEmpty(e.Data))
-            .Select(e => new { data = e.Data })
-            .ToList();
-        return Ok(list);
     }
 }

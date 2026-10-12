@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace PlatformManagementSystem.MVC.ViewModels.Lesson
 {
@@ -7,11 +7,9 @@ namespace PlatformManagementSystem.MVC.ViewModels.Lesson
         public int CourseId { get; set; }
 
         [Required]
-        public string Title { get; set; } = string.Empty;
-
-        public string? VideoUrl { get; set; }
+        public string Title { get; set; }
 
         [Required]
-        public string Content { get; set; } = string.Empty;
+        public string Content { get; set; }
     }
 }

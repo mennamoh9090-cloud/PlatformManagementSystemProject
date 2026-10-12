@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PlatformManagementSystem.Application.Interfaces;
 using PlatformManagementSystem.Domain.Entities;
-using System.ComponentModel.DataAnnotations;
 
 namespace PlatformManagementSystem.API.Controllers;
 
@@ -17,12 +16,9 @@ public class LessonController : ControllerBase
         _unitOfWork = unitOfWork;
     }
 
-    [HttpGet("ByCourse/{courseId}")]
+    [HttpGet("course/{courseId}")]
     public async Task<IActionResult> GetByCourse(int courseId)
     {
-        if (courseId <= 0)
-            return BadRequest("Invalid course ID");
-
         var lessons = await _unitOfWork.Lessons.FindAsync(l => l.CourseId == courseId);
         var result = lessons
             .OrderBy(l => l.Id)
@@ -47,8 +43,8 @@ public class LessonController : ControllerBase
         var lesson = new Lesson
         {
             CourseId = request.CourseId,
-            Title = request.Title,
-            Content = request.Content,
+            Title = request.Title ?? string.Empty,
+            Content = request.Content ?? string.Empty,
             CreatedAt = DateTime.UtcNow
         };
 
@@ -61,9 +57,6 @@ public class LessonController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        if (id <= 0)
-            return BadRequest("Invalid lesson ID");
-
         var lesson = await _unitOfWork.Lessons.GetByIdAsync(id);
         if (lesson == null)
             return NotFound();
@@ -75,17 +68,8 @@ public class LessonController : ControllerBase
 
     public sealed class CreateLessonRequest
     {
-        [Range(1, int.MaxValue, ErrorMessage = "A valid CourseId is required")]
         public int CourseId { get; set; }
-
-        [Required(ErrorMessage = "Title is required")]
-        [StringLength(300, MinimumLength = 3, ErrorMessage = "Title must be between 3 and 300 characters")]
-        public string Title { get; set; } = "";
-
-        [Required(ErrorMessage = "Content is required")]
-        [StringLength(5000, MinimumLength = 10, ErrorMessage = "Content must be between 10 and 5000 characters")]
-        public string Content { get; set; } = "";
-
-        public string? VideoUrl { get; set; }
+        public string? Title { get; set; }
+        public string? Content { get; set; }
     }
 }

@@ -29,7 +29,7 @@ public class ExamController : ControllerBase
     }
 
     [Authorize(Roles = "Instructor")]
-    [HttpPost("CreateLegacy")]
+    [HttpPost]
     public async Task<IActionResult> CreateLegacy([FromBody] CreateExamRequest request)
     {
         var examId = await _examService.CreateExamAsync(

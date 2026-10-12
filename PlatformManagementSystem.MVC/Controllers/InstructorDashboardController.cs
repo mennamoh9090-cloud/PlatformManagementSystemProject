@@ -1,13 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using PlatformManagementSystem.MVC.ViewModels.Course;
 using PlatformManagementSystem.MVC.ViewModels.Enrollment;
 using PlatformManagementSystem.MVC.ViewModels.Exam;
 using PlatformManagementSystem.MVC.ViewModels.InstructorDashboard;
-using PlatformManagementSystem.MVC.ViewModels.Live;
 using System.Security.Claims;
-using System.Text.Json.Serialization;
 
 [Authorize(Roles = "Instructor")]
 public class InstructorDashboardController : Controller
@@ -29,29 +26,12 @@ public class InstructorDashboardController : Controller
             .GetAsync<List<CourseVM>>(
                 $"Course/ByInstructor/{instructorId}");
 
-        var totalLiveSessions = 0;
-
-        if (courses != null && courses.Any())
-        {
-            foreach (var course in courses)
-            {
-                var sessions = await _apiService
-                    .GetAsync<List<LiveSessionVM>>(
-                        $"LiveSession/ByCourse/{course.CourseId}");
-
-                if (sessions != null)
-                {
-                    totalLiveSessions += sessions.Count(s => s.IsActive);
-                }
-            }
-        }
-
         var vm = new InstructorDashboardVM
         {
             MyCourses = courses ?? new List<CourseVM>(),
             TotalCourses = courses?.Count ?? 0,
             TotalStudents = courses?.Sum(c => c.StudentCount) ?? 0,
-            TotalLiveSessions = totalLiveSessions
+            TotalLiveSessions = 0
         };
 
         return View(vm);
@@ -62,18 +42,12 @@ public class InstructorDashboardController : Controller
     public async Task<IActionResult> CreateCourse(CreateCourseVM model)
     {
         if (!ModelState.IsValid)
-        {
-            await PopulateCategories(model);
             return View(model);
-        }
 
         var dto = new
         {
             Title = model.Title,
-            Description = model.Description,
-            Price = model.Price,
-            CategoryId = model.CategoryId,
-            ThumbnailUrl = model.ThumbnailUrl ?? ""
+            Description = model.Description
         };
 
         var result = await _apiService.PostAsync("Course", dto);
@@ -81,7 +55,6 @@ public class InstructorDashboardController : Controller
         if (!result)
         {
             TempData["Error"] = "Something went wrong!";
-            await PopulateCategories(model);
             return View(model);
         }
 
@@ -90,28 +63,9 @@ public class InstructorDashboardController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> CreateCourse()
+    public IActionResult CreateCourse()
     {
-        var model = new CreateCourseVM();
-        await PopulateCategories(model);
-        return View(model);
-    }
-    
-    private async Task PopulateCategories(CreateCourseVM model)
-    {
-        var categories = await _apiService.GetAsync<List<CategoryResponse>>("Category");
-        if (categories != null)
-        {
-            model.Categories = categories.Select(c => new SelectListItem 
-            { 
-                Value = c.Id.ToString(), 
-                Text = c.Name 
-            }).ToList();
-        }
-        else
-        {
-            model.Categories = new List<SelectListItem>();
-        }
+        return View(new CreateCourseVM());
     }
 
     [HttpGet]
@@ -138,7 +92,7 @@ public class InstructorDashboardController : Controller
     [HttpGet]
     public async Task<IActionResult> ManageCourse(int courseId)
     {
-        var details = await _apiService.GetAsync<CourseDetailsResponse>($"Course/InstructorDetails/{courseId}");
+        var details = await _apiService.GetAsync<CourseDetailsResponse>($"Course/details/{courseId}");
         if (details == null)
             return RedirectToAction("Index");
 
@@ -216,14 +170,5 @@ public class InstructorDashboardController : Controller
     {
         public int Id { get; set; }
         public string? Title { get; set; }
-    }
-    
-    private sealed class CategoryResponse
-    {
-        [JsonPropertyName("id")]
-        public int Id { get; set; }
-        
-        [JsonPropertyName("name")]
-        public string? Name { get; set; }
     }
 }

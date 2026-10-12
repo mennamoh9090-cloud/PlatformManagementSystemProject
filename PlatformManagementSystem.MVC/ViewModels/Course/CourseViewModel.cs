@@ -1,3 +1,5 @@
+﻿using Microsoft.Bot.Schema;
+
 namespace PlatformManagementSystem.MVC.ViewModels.Course
 {
     public class CourseViewModel

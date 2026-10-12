@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PlatformManagementSystem.MVC.ViewModels.Live;
 using PlatformManagementSystem.MVC.ViewModels.Student;
 
 [Authorize(Roles = "Student")]
@@ -97,14 +96,6 @@ public class StudentDashboardController : Controller
                 })
                 .ToList()
         };
-
-        var liveSessions = await _apiService
-            .GetAsync<List<LiveSessionVM>>($"LiveSession/ByCourse/{courseId}");
-
-        var activeSession = liveSessions?
-            .FirstOrDefault(s => s.IsActive);
-
-        ViewBag.ActiveLiveSessionId = activeSession?.Id ?? 0;
 
         return View(model);
     }

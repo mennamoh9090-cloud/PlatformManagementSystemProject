@@ -1,11 +1,10 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PlatformManagementSystem.Application.DTOs.Dashboard.Admin;
 using PlatformManagementSystem.Domain.Entities;
 using PlatformManagementSystem.Infrastructure.Persistence;
-using PlatformManagementSystem.Domain.Enums;
 
 [Authorize(Roles = "Admin")]
 [ApiController]
@@ -153,52 +152,15 @@ public class AdminController : ControllerBase
     {
         var courses = await _context.Courses
             .Include(c => c.Enrollments)
-            .Include(c => c.Instructor)
             .Select(c => new
             {
                 c.Id,
                 c.Title,
-                StudentsCount = c.Enrollments.Count,
-                Status = c.Status,
-                InstructorName = c.Instructor.FullName
+                StudentsCount = c.Enrollments.Count
             })
             .ToListAsync();
 
         return Ok(courses);
-    }
-
-    [HttpDelete("DeleteCourse/{id}")]
-    public async Task<IActionResult> DeleteCourse(int id)
-    {
-        var course = await _context.Courses.FindAsync(id);
-        if (course == null)
-            return NotFound("Course not found");
-
-        _context.Courses.Remove(course);
-        await _context.SaveChangesAsync();
-        return Ok("Course deleted");
-    }
-
-    [HttpPost("ApproveCourse/{id}")]
-    public async Task<IActionResult> ApproveCourse(int id)
-    {
-        var course = await _context.Courses.FindAsync(id);
-        if (course == null) return NotFound("Course not found");
-
-        course.Status = CourseStatus.Approved;
-        await _context.SaveChangesAsync();
-        return Ok("Course approved");
-    }
-
-    [HttpPost("RejectCourse/{id}")]
-    public async Task<IActionResult> RejectCourse(int id)
-    {
-        var course = await _context.Courses.FindAsync(id);
-        if (course == null) return NotFound("Course not found");
-
-        course.Status = CourseStatus.Rejected;
-        await _context.SaveChangesAsync();
-        return Ok("Course rejected");
     }
 
     // STATS

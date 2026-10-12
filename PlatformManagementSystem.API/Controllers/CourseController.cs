@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PlatformManagementSystem.Application.DTOs.Course;
@@ -6,7 +6,6 @@ using PlatformManagementSystem.Application.Interfaces.Services;
 using PlatformManagementSystem.Domain.Entities;
 using PlatformManagementSystem.Infrastructure.Persistence;
 using System.Security.Claims;
-using PlatformManagementSystem.Domain.Enums;
 
 namespace PlatformManagementSystem.API.Controllers
 {
@@ -32,16 +31,11 @@ namespace PlatformManagementSystem.API.Controllers
         public async Task<IActionResult> GetCourses()
         {
             var courses = await _context.Courses
-                .Where(c => c.Status == CourseStatus.Approved)
-                .Include(c => c.Instructor)
                 .Select(c => new
                 {
                     Id = c.Id,
                     Title = c.Title,
-                    Description = c.Description,
-                    ThumbnailUrl = c.ThumbnailUrl ?? "",
-                    InstructorName = c.Instructor != null ? c.Instructor.FullName : "",
-                    Price = c.Price
+                    Description = c.Description
                 })
                 .ToListAsync();
 
@@ -62,11 +56,7 @@ namespace PlatformManagementSystem.API.Controllers
             {
                 Title = dto.Title,
                 Description = dto.Description,
-                InstructorId = instructorId,
-                Price = dto.Price,
-                CategoryId = dto.CategoryId,
-                ThumbnailUrl = dto.ThumbnailUrl,
-                Status = CourseStatus.Approved
+                InstructorId = instructorId
             };
 
             _context.Courses.Add(course);
@@ -80,9 +70,6 @@ namespace PlatformManagementSystem.API.Controllers
         [HttpGet("ByInstructor/{instructorId}")]
         public async Task<IActionResult> GetCoursesByInstructor(string instructorId)
         {
-            if (string.IsNullOrWhiteSpace(instructorId))
-                return BadRequest("Instructor ID is required");
-
             var courses = await _context.Courses
                 .Where(c => c.InstructorId == instructorId)
                 .Include(c => c.Lessons)
@@ -93,8 +80,7 @@ namespace PlatformManagementSystem.API.Controllers
                     Title = c.Title,
                     Description = c.Description,
                     LessonsCount = c.Lessons.Count,
-                    StudentCount = c.Enrollments.Count,
-                    Status = c.Status
+                    StudentsCount = c.Enrollments.Count
                 })
                 .ToListAsync();
 
@@ -106,9 +92,6 @@ namespace PlatformManagementSystem.API.Controllers
         [HttpGet("InstructorStats/{instructorId}")]
         public async Task<IActionResult> GetInstructorStats(string instructorId)
         {
-            if (string.IsNullOrWhiteSpace(instructorId))
-                return BadRequest("Instructor ID is required");
-
             var courses = await _context.Courses
                 .Where(c => c.InstructorId == instructorId)
                 .Include(c => c.Enrollments)
@@ -139,14 +122,11 @@ namespace PlatformManagementSystem.API.Controllers
         [HttpGet("details/{id}")]
         public async Task<IActionResult> GetCourseDetails(int id)
         {
-            if (id <= 0)
-                return BadRequest("Invalid course ID");
-
             var course = await _context.Courses
                 .Include(c => c.Instructor)
                 .Include(c => c.Lessons)
                 .Include(c => c.Enrollments)
-                .FirstOrDefaultAsync(c => c.Id == id && c.Status == CourseStatus.Approved);
+                .FirstOrDefaultAsync(c => c.Id == id);
 
             if (course == null)
                 return NotFound();
@@ -157,45 +137,6 @@ namespace PlatformManagementSystem.API.Controllers
                 course.Title,
                 course.Description,
                 course.Price,
-                ThumbnailUrl = course.ThumbnailUrl ?? "",
-                InstructorName = course.Instructor.FullName,
-                StudentsCount = course.Enrollments.Count,
-                Lessons = course.Lessons.Select(l => new
-                {
-                    l.Id,
-                    l.Title
-                })
-            });
-        }
-
-        //  Instructor Course Details
-        [Authorize(Roles = "Instructor")]
-        [HttpGet("InstructorDetails/{id}")]
-        public async Task<IActionResult> GetInstructorCourseDetails(int id)
-        {
-            if (id <= 0)
-                return BadRequest("Invalid course ID");
-
-            var instructorId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(instructorId))
-                return Unauthorized();
-
-            var course = await _context.Courses
-                .Include(c => c.Instructor)
-                .Include(c => c.Lessons)
-                .Include(c => c.Enrollments)
-                .FirstOrDefaultAsync(c => c.Id == id && c.InstructorId == instructorId);
-
-            if (course == null)
-                return NotFound();
-
-            return Ok(new
-            {
-                course.Id,
-                course.Title,
-                course.Description,
-                course.Price,
-                ThumbnailUrl = course.ThumbnailUrl ?? "",
                 InstructorName = course.Instructor.FullName,
                 StudentsCount = course.Enrollments.Count,
                 Lessons = course.Lessons.Select(l => new

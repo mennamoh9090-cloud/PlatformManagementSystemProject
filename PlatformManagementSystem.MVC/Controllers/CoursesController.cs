@@ -3,16 +3,19 @@ using PlatformManagementSystem.MVC.ViewModels.Course;
 using System.Net.Http.Headers;
 using System.Text.Json;
 
-namespace PlatformManagementSystem.MVC.Controllers;
-
-public class CoursesController(IHttpClientFactory httpClientFactory) : Controller
+public class CoursesController : Controller
 {
-    private static readonly JsonSerializerOptions _jsonOptions = new() { PropertyNameCaseInsensitive = true };
+    private readonly IHttpClientFactory _httpClientFactory;
+
+    public CoursesController(IHttpClientFactory httpClientFactory)
+    {
+        _httpClientFactory = httpClientFactory;
+    }
 
     // ================== INDEX ==================
-    public async Task<IActionResult> Index(string? search)
+    public async Task<IActionResult> Index()
     {
-        var client = httpClientFactory.CreateClient("API");
+        var client = _httpClientFactory.CreateClient("API");
 
         var response = await client.GetAsync("Course");
 
@@ -21,19 +24,8 @@ public class CoursesController(IHttpClientFactory httpClientFactory) : Controlle
 
         var json = await response.Content.ReadAsStringAsync();
 
-        var courses = JsonSerializer.Deserialize<List<CourseViewModel>>(json, _jsonOptions) ?? [];
-
-        if (!string.IsNullOrWhiteSpace(search))
-        {
-            var term = search.Trim();
-            courses = courses
-                .Where(c =>
-                    (!string.IsNullOrWhiteSpace(c.Title) && c.Title.Contains(term, StringComparison.OrdinalIgnoreCase)) ||
-                    (!string.IsNullOrWhiteSpace(c.Description) && c.Description.Contains(term, StringComparison.OrdinalIgnoreCase)))
-                .ToList();
-        }
-
-        ViewBag.Search = search ?? string.Empty;
+        var courses = JsonSerializer.Deserialize<List<CourseViewModel>>(json,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
         return View(courses);
     }
@@ -41,7 +33,7 @@ public class CoursesController(IHttpClientFactory httpClientFactory) : Controlle
     // ================== DETAILS ==================
     public async Task<IActionResult> Details(int id)
     {
-        var client = httpClientFactory.CreateClient("API");
+        var client = _httpClientFactory.CreateClient("API");
 
         var response = await client.GetAsync($"Course/details/{id}");
 
@@ -53,7 +45,9 @@ public class CoursesController(IHttpClientFactory httpClientFactory) : Controlle
         if (string.IsNullOrWhiteSpace(json))
             return NotFound();
 
-        var course = JsonSerializer.Deserialize<CourseDetailsViewModel>(json, _jsonOptions);
+        var course = JsonSerializer.Deserialize<CourseDetailsViewModel>(
+            json,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
         if (course == null)
             return NotFound();
@@ -65,7 +59,7 @@ public class CoursesController(IHttpClientFactory httpClientFactory) : Controlle
     [HttpPost]
     public async Task<IActionResult> Enroll(int courseId)
     {
-        var client = httpClientFactory.CreateClient("API");
+        var client = _httpClientFactory.CreateClient("API");
 
         var token = HttpContext.Session.GetString("UserToken");
 

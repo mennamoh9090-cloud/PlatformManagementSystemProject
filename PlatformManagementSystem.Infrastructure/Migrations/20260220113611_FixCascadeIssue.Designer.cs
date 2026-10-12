@@ -12,8 +12,8 @@ using PlatformManagementSystem.Infrastructure.Persistence;
 namespace PlatformManagementSystem.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260316203914_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260220113611_FixCascadeIssue")]
+    partial class FixCascadeIssue
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -310,10 +310,6 @@ namespace PlatformManagementSystem.Infrastructure.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<string>("ThumbnailUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -392,7 +388,7 @@ namespace PlatformManagementSystem.Infrastructure.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("Exams");
+                    b.ToTable("Exam");
                 });
 
             modelBuilder.Entity("PlatformManagementSystem.Domain.Entities.Lesson", b =>

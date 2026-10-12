@@ -11,7 +11,6 @@ using PlatformManagementSystem.Domain.Entities;
 using PlatformManagementSystem.Infrastructure.Persistence;
 using PlatformManagementSystem.Infrastructure.Repositories;
 using System.Text;
-using PlatformManagementSystem.Infrastructure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -156,9 +155,6 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-
-    var db = services.GetRequiredService<ApplicationDbContext>();
-    db.Database.Migrate();
     await IdentitySeeder.SeedRolesAndAdminAsync(services);
 }
 
